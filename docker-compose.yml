@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file: ./backend/.env
+    depends_on:
+      - db
+    networks:
+      - dividis_network
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: dividis
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - dividis_network
+    ports:
+      - "5432:5432"
+
+
+volumes:
+  postgres_data:
+
+networks:
+  dividis_network:
+    external: true
