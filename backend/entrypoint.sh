@@ -22,4 +22,4 @@ echo " - Cargando misiones (solo si no existen)..."
 python manage.py load_initial_missions || echo " [ERROR] Falló cargar misiones"
 
 echo "==> Iniciando servidor Django..."
-exec python manage.py runserver 0.0.0.0:8000
+exec python manage.py runserver 0.0.0.0:8002

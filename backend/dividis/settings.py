@@ -146,9 +146,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
-CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://flask-django-adso.jmtqu4.easypanel.host',
+]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # API Documentation
 SPECTACULAR_SETTINGS = {
