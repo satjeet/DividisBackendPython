@@ -3,7 +3,7 @@ attrs
 Django
 django-activity-stream
 django-cors-headers
-django-fsm
+viewflow
 djangorestframework
 djangorestframework_simplejwt
 drf-spectacular
