@@ -44,6 +44,31 @@ Sigue las instrucciones en consola para definir usuario, email y contraseña.
   ```
 - Si necesitas exponer la API a servidores externos (Google Cloud, Supabase, etc.), incluye sus URLs aquí.
 
+## Despliegue en Render (producción)
+
+Para desplegar este backend en [Render](https://render.com):
+
+1. Sube tu repositorio a GitHub.
+2. En Render, crea un nuevo servicio tipo **Web Service** y selecciona tu repo.
+3. Render detectará el `Dockerfile` automáticamente.
+4. Configura las variables de entorno en el panel de Render (no uses `.env` en producción):
+
+   - `DEBUG=False`
+   - `DJANGO_SECRET_KEY=una-clave-segura`
+   - `ALLOWED_HOSTS=dominio-que-te-da-render.com`
+   - `CORS_ALLOWED_ORIGINS=https://dividisfront-996639584668.southamerica-west1.run.app`
+   - `DB_NAME=dividis`
+   - `DB_USER=usuario_postgres`
+   - `DB_PASSWORD=contraseña_postgres`
+   - `DB_HOST=host_postgres_render`
+   - `DB_PORT=5432`
+
+5. Si usas base de datos de Render, crea el servicio Postgres y copia los datos de conexión.
+6. El frontend debe consumir la API usando la URL pública de Render.
+
+**Importante:**  
+En producción, solo permite el dominio del frontend productivo en `CORS_ALLOWED_ORIGINS` para mayor seguridad.
+
 ## Notas
 
 - Si necesitas reiniciar todo desde cero, ejecuta:
