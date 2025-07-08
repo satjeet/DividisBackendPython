@@ -80,6 +80,8 @@ docker-data/
 .DS_Store
 Thumbs.db
 
+.env
+
 # Testing
 .coverage
 htmlcov/

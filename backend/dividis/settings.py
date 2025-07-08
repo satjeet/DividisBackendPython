@@ -19,8 +19,6 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key-for-dev
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1').split(',')
-
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -146,9 +144,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-# CORS settings
-CORS_ALLOWED_ORIGINS = os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000').split(',')
-CORS_ALLOW_CREDENTIALS = True
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://flask-django-adso.jmtqu4.easypanel.host',
+]
+CORS_ALLOW_ALL_ORIGINS = True
 
 # API Documentation
 SPECTACULAR_SETTINGS = {
