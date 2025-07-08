@@ -8,4 +8,7 @@ RUN python manage.py collectstatic --noinput
 
 # Asegurar que los scripts sean ejecutables y usar /bin/sh explícitamente
 RUN chmod 755 entrypoint.sh wait-for-postgres.sh
+
+EXPOSE 8002
+
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
