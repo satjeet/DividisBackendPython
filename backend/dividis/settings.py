@@ -146,7 +146,7 @@ SIMPLE_JWT = {
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://flask-django-adso.jmtqu4.easypanel.host',
+    'https://services-dividis.jmtqu4.easypanel.host/',
 ]
 CORS_ALLOW_ALL_ORIGINS = True
 
