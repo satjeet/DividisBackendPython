@@ -166,31 +166,18 @@ DEFAULT_MISSION_POINTS = int(os.getenv('DEFAULT_MISSION_POINTS', '100'))
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '[{levelname}] {asctime} {name} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '[{levelname}] {message}',
-            'style': '{',
-        },
-    },
     'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'verbose',
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/django/dividis.log',
         },
     },
     'loggers': {
-        'api.models': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        '': {  # root logger
-            'handlers': ['console'],
-            'level': 'WARNING',
+        'django': {
+            'handlers': ['file'],
+            'level': 'DEBUG',
+            'propagate': True,
         },
     },
 }
