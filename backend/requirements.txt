@@ -12,7 +12,7 @@ inflection
 jsonschema
 jsonschema-specifications
 packaging
-psycopg2-binary
+psycopg2-binary>=2.9.6
 PyJWT
 python-dotenv
 PyYAML

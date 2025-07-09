@@ -1,13 +1,30 @@
 FROM python:3.11-slim
-WORKDIR /app
-COPY . .
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
-RUN pip install --upgrade pip && pip install -r requirements.txt
-RUN chmod +x entrypoint.sh wait-for-postgres.sh
-RUN python manage.py collectstatic --noinput
 
-# Asegurar que los scripts sean ejecutables y usar /bin/sh explícitamente
-RUN chmod 755 entrypoint.sh wait-for-postgres.sh
+# Install system dependencies first (includes PostgreSQL dev tools)
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    libpq-dev \
+    python3-dev \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy requirements first for better layer caching
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
+
+# Copy the rest of the application
+COPY . .
+
+# Make scripts executable
+RUN chmod +x entrypoint.sh wait-for-postgres.sh
+
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8002
 
