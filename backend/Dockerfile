@@ -31,18 +31,6 @@ COPY . .
 # Make wait-for-postgres script executable
 RUN chmod +x wait-for-postgres.sh
 
-# Database initialization and application setup
-RUN echo "==> Waiting for PostgreSQL..." && \
-    ./wait-for-postgres.sh "$DB_HOST" && \
-    echo "==> Running migrations..." && \
-    python manage.py migrate --noinput && \
-    echo "==> Migration status:" && \
-    python manage.py showmigrations && \
-    echo "==> Loading initial data..." && \
-    (python manage.py load_level_titles || echo "[WARNING] Failed to load level titles (may be normal if existing)") && \
-    (python manage.py loaddata api/fixtures/initial_modules.json || echo "[WARNING] Failed to load modules (may be normal if existing)") && \
-    (python manage.py load_initial_missions || echo "[WARNING] Failed to load missions (may be normal if existing)")
-
 # Collect static files (uncomment if needed)
 # RUN python manage.py collectstatic --noinput
 
@@ -53,4 +41,4 @@ HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8008/health/ || exit 1
 
 # Start Django server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8008"]
+CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8008"]
