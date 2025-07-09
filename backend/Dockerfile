@@ -42,7 +42,7 @@ EXPOSE 8008
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:$PORT/health/ || exit 1
+    CMD curl -f http://localhost:8008/health/ || exit 1
 
 # Production entrypoint
 CMD ["sh", "-c", \
@@ -51,7 +51,7 @@ CMD ["sh", "-c", \
      python manage.py load_level_titles || true && \
      python manage.py loaddata api/fixtures/initial_modules.json || true && \
      python manage.py load_initial_missions || true && \
-     gunicorn --bind 0.0.0.0:$PORT \
+     gunicorn --bind 0.0.0.0:8008 \
               --workers 4 \
               --timeout 120 \
               --access-logfile - \
