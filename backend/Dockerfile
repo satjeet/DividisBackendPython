@@ -1,6 +1,6 @@
 FROM python:3.11-slim
 
-# Install system dependencies first (includes PostgreSQL dev tools)
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     libpq-dev \
@@ -12,16 +12,16 @@ WORKDIR /app
 
 # Copy requirements first for better layer caching
 COPY requirements.txt .
-
-# Install Python dependencies
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Copy the rest of the application
 COPY . .
 
 # Make scripts executable
 RUN chmod +x entrypoint.sh wait-for-postgres.sh
+
+# Create log directory and file
+RUN mkdir -p /var/log/django && touch /var/log/django/dividis.log && chmod -R 777 /var/log/django
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
