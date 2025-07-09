@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_fsm import FSMField, transition
+from viewflow.fsm import FSMField, transition
 from django.conf import settings
 import uuid
 
