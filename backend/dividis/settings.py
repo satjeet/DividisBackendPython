@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key-for-development')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
+DEBUG = True
 
 # Application definition
 INSTALLED_APPS = [
@@ -162,26 +162,5 @@ ACTSTREAM_SETTINGS = {
 INITIAL_MODULE = os.getenv('INITIAL_MODULE', 'salud')
 DEFAULT_MISSION_POINTS = int(os.getenv('DEFAULT_MISSION_POINTS', '100'))
 
-# Logging config para mostrar logs de api.models a nivel INFO
-if os.getenv('DISABLE_LOGGING', 'False').lower() == 'true':
-    LOGGING_CONFIG = None
-else:
-    # Your existing logging config
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': False,
-        'handlers': {
-            'file': {
-                'level': 'DEBUG',
-                'class': 'logging.FileHandler',
-                'filename': '/var/log/django/dividis.log',
-            },
-        },
-        'loggers': {
-            'django': {
-                'handlers': ['file'],
-                'level': 'DEBUG',
-                'propagate': True,
-            },
-        },
-    }
+
+LOGGING_CONFIG = None
