@@ -21,3 +21,4 @@ rpds-py
 sqlparse
 tzdata
 uritemplate
+django_fsm
