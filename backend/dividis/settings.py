@@ -32,7 +32,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
-     'django_fsm',
     'actstream',
     # Local apps
     'api',
@@ -80,10 +79,6 @@ DATABASES = {
         'PORT': os.getenv('DB_PORT', '5432'),
 }
 }
-print("=== DJANGO DATABASE SETTINGS ===")
-print("DEBUG:", DEBUG)
-print("DATABASE ENGINE:", DATABASES['default']['ENGINE'])
-print("DATABASE NAME:", DATABASES['default']['NAME'])
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

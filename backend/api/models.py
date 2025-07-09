@@ -6,7 +6,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django_fsm import FSMField, transition
 from django.conf import settings
 import uuid
 
@@ -69,44 +68,96 @@ class Module(models.Model):
         ('unlocked', 'Unlocked'),
         ('completed', 'Completed'),
     )
+    
+    STATE_TRANSITIONS = {
+        'locked': ['unlocked'],
+        'unlocked': ['completed'],
+        'completed': []
+    }
+
     id = models.CharField(max_length=50, primary_key=True)
     name = models.CharField(max_length=100)
     description = models.TextField()
     icon = models.CharField(max_length=50)
     order = models.IntegerField()
     xp_required = models.IntegerField(default=0)
-    state = FSMField(default='locked', choices=STATES)
+    state = models.CharField(max_length=20, choices=STATES, default='locked')
+    
     class Meta:
         ordering = ['order']
+        
     def __str__(self):
         return self.name
-    @transition(field=state, source='locked', target='unlocked')
+
+    def _validate_transition(self, new_state):
+        """Validate if transition is allowed"""
+        if new_state not in self.STATE_TRANSITIONS.get(self.state, []):
+            raise ValueError(f"Cannot transition from {self.state} to {new_state}")
+        return True
+
     def unlock(self):
+        """Transition from locked to unlocked"""
+        self._validate_transition('unlocked')
         self.state = 'unlocked'
         self.save(update_fields=['state'])
-    @transition(field=state, source='unlocked', target='completed')
+
     def complete(self):
-        pass
+        """Transition from unlocked to completed"""
+        self._validate_transition('completed')
+        self.state = 'completed'
+        self.save(update_fields=['state'])
 
 class ModuleProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     module = models.ForeignKey(Module, on_delete=models.CASCADE)
-    state = FSMField(default='locked', choices=Module.STATES)
+    state = models.CharField(
+        max_length=20, 
+        choices=Module.STATES, 
+        default='locked'
+    )
     experience_points = models.IntegerField(default=0)
     last_activity = models.DateTimeField(auto_now=True)
-    auto_unlocked = models.BooleanField(default=False)  # Nuevo campo
+    auto_unlocked = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ['user', 'module']
+
     def __str__(self):
         return f"{self.user.username}'s progress in {self.module.name}"
-    @transition(field=state, source='locked', target='unlocked')
+
+    def _validate_transition(self, new_state):
+        """Validate state transition rules"""
+        allowed_transitions = {
+            'locked': ['unlocked'],
+            'unlocked': ['completed'],
+            'completed': []
+        }
+        if new_state not in allowed_transitions.get(self.state, []):
+            raise ValueError(
+                f"Invalid transition from {self.state} to {new_state}"
+            )
+        return True
+
     def unlock(self):
+        """Transition from locked to unlocked state"""
+        self._validate_transition('unlocked')
         self.state = 'unlocked'
         self.save(update_fields=['state'])
-    @transition(field=state, source='unlocked', target='completed')
+
     def complete(self):
-        pass
+        """Transition from unlocked to completed state"""
+        self._validate_transition('completed')
+        self.state = 'completed'
+        self.save(update_fields=['state'])
+
+    def force_unlock(self, auto_unlock=False):
+        """
+        Admin/special case unlock that bypasses normal validation
+        Sets auto_unlocked flag if specified
+        """
+        self.state = 'unlocked'
+        self.auto_unlocked = auto_unlock
+        self.save(update_fields=['state', 'auto_unlocked'])
 
 from django.db.models import JSONField
 
@@ -137,20 +188,53 @@ class Mission(models.Model):
 class MissionProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     mission = models.ForeignKey(Mission, on_delete=models.CASCADE)
-    state = FSMField(default='active', choices=Mission.STATES)
+    state = models.CharField(
+        max_length=20,
+        choices=Mission.STATES,
+        default='active'
+    )
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
+
     class Meta:
         unique_together = ['user', 'mission']
+
     def __str__(self):
         return f"{self.user.username}'s progress on {self.mission.title}"
-    @transition(field=state, source='active', target='completed')
+
+    def _validate_transition(self, new_state):
+        """Validate state transition rules"""
+        allowed_transitions = {
+            'active': ['completed', 'failed'],
+            'completed': [],
+            'failed': []
+        }
+        if new_state not in allowed_transitions.get(self.state, []):
+            raise ValueError(
+                f"Invalid transition from {self.state} to {new_state}. "
+                f"Allowed transitions: {allowed_transitions.get(self.state)}"
+            )
+        return True
+
     def complete(self):
+        """Transition from active to completed state"""
         from django.utils import timezone
+        self._validate_transition('completed')
+        self.state = 'completed'
         self.completed_at = timezone.now()
-    @transition(field=state, source='active', target='failed')
+        self.save(update_fields=['state', 'completed_at'])
+
     def fail(self):
-        pass
+        """Transition from active to failed state"""
+        self._validate_transition('failed')
+        self.state = 'failed'
+        self.save(update_fields=['state'])
+
+    def reset(self):
+        """Reset progress back to active state (admin/special cases)"""
+        self.state = 'active'
+        self.completed_at = None
+        self.save(update_fields=['state', 'completed_at'])
 
 class Achievement(models.Model):
     name = models.CharField(max_length=100)
