@@ -26,7 +26,7 @@ COPY . .
 RUN chmod +x entrypoint.sh wait-for-postgres.sh
 
 # Collect static files (with temporary logging disabled)
-RUN python manage.py collectstatic --noinput --settings=dividis.settings
+#RUN python manage.py collectstatic --noinput --settings=dividis.settings
 
 EXPOSE 8002
 
