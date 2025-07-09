@@ -42,7 +42,7 @@ EXPOSE 8008
 
 # Production entrypoint
 CMD ["sh", "-c", \
-    "./wait-for-postgres.sh $DB_HOST && \
+    "./wait-for-postgres.sh services_pgsql_engine && \
      python manage.py migrate --noinput && \
      python manage.py load_level_titles || true && \
      python manage.py loaddata api/fixtures/initial_modules.json || true && \
