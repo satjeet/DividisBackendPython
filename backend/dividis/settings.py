@@ -163,21 +163,25 @@ INITIAL_MODULE = os.getenv('INITIAL_MODULE', 'salud')
 DEFAULT_MISSION_POINTS = int(os.getenv('DEFAULT_MISSION_POINTS', '100'))
 
 # Logging config para mostrar logs de api.models a nivel INFO
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/django.log'),  # Now inside the container
+if os.getenv('DISABLE_LOGGING', 'False').lower() == 'true':
+    LOGGING_CONFIG = None
+else:
+    # Your existing logging config
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'handlers': {
+            'file': {
+                'level': 'DEBUG',
+                'class': 'logging.FileHandler',
+                'filename': '/var/log/django/dividis.log',
+            },
         },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
+            },
         },
-    },
-}
+    }

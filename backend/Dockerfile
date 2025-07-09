@@ -10,6 +10,11 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Create logs directory with correct permissions
+RUN mkdir -p /var/log/django && \
+    chown -R www-data:www-data /var/log/django && \
+    chmod -R 755 /var/log/django
+
 # Copy requirements first for caching
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
@@ -20,13 +25,8 @@ COPY . .
 # Make scripts executable
 RUN chmod +x entrypoint.sh wait-for-postgres.sh
 
-# Fix logging directory
-RUN mkdir -p /var/log/django && \
-    touch /var/log/django/dividis.log && \
-    chmod -R 777 /var/log/django
-
-# Collect static files
-RUN python manage.py collectstatic --noinput
+# Collect static files (with temporary logging disabled)
+RUN python manage.py collectstatic --noinput --settings=your_project.settings_no_logging
 
 EXPOSE 8002
 
