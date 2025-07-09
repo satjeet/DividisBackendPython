@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
-     'viewflow',
+     'django_fsm',
     'actstream',
     # Local apps
     'api',
