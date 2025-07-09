@@ -13,7 +13,9 @@ WORKDIR /app
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    DJANGO_SETTINGS_MODULE=dividis.settings
+    DJANGO_SETTINGS_MODULE=dividis.settings \
+    PYTHONPATH=/app \
+    PORT=8008
 
 # Create directory structure and set permissions
 RUN mkdir -p /var/log/django && \
@@ -23,7 +25,9 @@ RUN mkdir -p /var/log/django && \
 
 # Copy requirements first for layer caching
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install gunicorn whitenoise
 
 # Copy application code
 COPY . .
@@ -31,14 +35,25 @@ COPY . .
 # Make wait-for-postgres script executable
 RUN chmod +x wait-for-postgres.sh
 
-# Collect static files (uncomment if needed)
-# RUN python manage.py collectstatic --noinput
+# Collect static files
+RUN python manage.py collectstatic --noinput
 
 EXPOSE 8008
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:8008/health/ || exit 1
+    CMD curl -f http://localhost:$PORT/health/ || exit 1
 
-# Start Django server
-CMD ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8008"]
+# Production entrypoint
+CMD ["sh", "-c", \
+    "./wait-for-postgres.sh $DB_HOST && \
+     python manage.py migrate --noinput && \
+     python manage.py load_level_titles || true && \
+     python manage.py loaddata api/fixtures/initial_modules.json || true && \
+     python manage.py load_initial_missions || true && \
+     gunicorn --bind 0.0.0.0:$PORT \
+              --workers 4 \
+              --timeout 120 \
+              --access-logfile - \
+              --error-logfile - \
+              dividis.wsgi"]
