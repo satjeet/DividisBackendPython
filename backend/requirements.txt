@@ -1,9 +1,9 @@
 asgiref
 attrs
-Django
-django-activity-stream
+Django>=4.2
+django-activity-stream>=1.6.0
 django-cors-headers
-djangorestframework
+djangorestframework>=3.14
 djangorestframework_simplejwt
 drf-spectacular
 gunicorn
