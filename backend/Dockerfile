@@ -28,6 +28,6 @@ RUN chmod +x entrypoint.sh wait-for-postgres.sh
 # Collect static files (with temporary logging disabled)
 #RUN python manage.py collectstatic --noinput --settings=dividis.settings
 
-EXPOSE 8002
+EXPOSE 8008
 
 ENTRYPOINT ["/bin/sh", "./entrypoint.sh"]
