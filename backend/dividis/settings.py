@@ -32,7 +32,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_spectacular',
-    'django_fsm',
+     'viewflow',
     'actstream',
     # Local apps
     'api',
@@ -170,7 +170,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/django/dividis.log',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),  # Now inside the container
         },
     },
     'loggers': {

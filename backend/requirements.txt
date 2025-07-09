@@ -21,4 +21,4 @@ rpds-py
 sqlparse
 tzdata
 uritemplate
-viewflow
+viewflow>=2.0.0
