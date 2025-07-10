@@ -17,7 +17,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key-for-development')
 
 # Entorno (local o production)
-ENV = os.getenv('ENV', 'local')
+ENV = os.getenv('ENV', 'production')
 
 # Configuración según entorno
 if ENV == 'production':
@@ -29,6 +29,7 @@ else:
     ALLOWED_HOSTS = ['localhost', '127.0.0.1']
     CORS_ALLOWED_ORIGINS = [
         'http://localhost:3000',
+        "https://dividisfront-996639584668.southamerica-west1.run.app",
         'http://127.0.0.1:3000'
     ]
 

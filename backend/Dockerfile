@@ -38,7 +38,7 @@ RUN chmod +x wait-for-postgres.sh
 # Collect static files
 RUN python manage.py collectstatic --noinput
 
-EXPOSE 8000
+EXPOSE 8008
 
 # Production entrypoint
 CMD ["sh", "-c", \
