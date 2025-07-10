@@ -3,18 +3,11 @@ services:
     build: ./backend
     ports:
       - "8000:8000"
-    env_file: ./backend/.env.local
+    env_file: ./backend/.env
     depends_on:
       - db
     networks:
       - dividis_network
-    command: >
-      sh -c "./wait-for-postgres.sh db &&
-             python manage.py migrate --noinput &&
-             python manage.py loaddata api/fixtures/initial_modules.json &&
-             python manage.py load_initial_missions &&
-             python manage.py load_level_titles &&
-             gunicorn dividis.wsgi:application --bind 0.0.0.0:8000"
 
   db:
     image: postgres:15-alpine

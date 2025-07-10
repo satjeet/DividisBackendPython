@@ -79,6 +79,48 @@ cd dividis
 
 ---
 
+### 🐳 Selección de entorno: local o cloud
+
+Ahora existen versiones separadas para los archivos principales según el entorno que vayas a usar (local o cloud):
+
+| Archivo principal                  | Versión local                        | Versión cloud                        |
+|------------------------------------|--------------------------------------|--------------------------------------|
+| docker-compose.yml                 | docker-compose.local.yml             | docker-compose.cloud.yml             |
+| backend/Dockerfile                 | backend/Dockerfile.local             | backend/Dockerfile.cloud             |
+| backend/wait-for-postgres.sh       | backend/wait-for-postgres local.sh   | backend/wait-for-postgres cloud.sh   |
+
+**Antes de levantar el entorno, reemplaza los archivos principales por la versión correspondiente:**
+
+#### Para desarrollo local:
+
+```bash
+cp docker-compose.local.yml docker-compose.yml
+cp backend/Dockerfile.local backend/Dockerfile
+cp backend/wait-for-postgres\ local.sh backend/wait-for-postgres.sh
+```
+
+#### Para despliegue en cloud:
+
+```bash
+cp docker-compose.cloud.yml docker-compose.yml
+cp backend/Dockerfile.cloud backend/Dockerfile
+cp backend/wait-for-postgres\ cloud.sh backend/wait-for-postgres.sh
+```
+
+Luego ejecuta normalmente:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### 🐳 Consideraciones para Docker y comunicación Frontend-Backend
+
+- Usa `backend/.env.local` para desarrollo local y `backend/.env.production` para despliegue productivo.
+- El frontend debe apuntar a la URL y puerto del backend según el entorno.
+- Si tu base de datos requiere SSL en producción, asegúrate de que la cadena de conexión de Django lo contemple (por ejemplo, usando `?sslmode=require`).
+
 ## 🏗️ Instalación
 
 1. **Clonar el repositorio:**
