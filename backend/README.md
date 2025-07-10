@@ -34,9 +34,50 @@ Sigue las instrucciones en consola para definir usuario, email y contraseña.
 - **Solución de errores 400:** Los errores al guardar declaraciones se resolvieron asegurando que los módulos y misiones existan en la base de datos.
 - **Admin Django con estilos:** El admin de Django ahora siempre se ve correctamente, sin importar el entorno.
 
+## Configuración de entornos: local vs producción
+
+Este backend soporta configuración diferenciada para desarrollo local y producción en la nube (Google Cloud, Supabase, Render, etc.) usando la variable `ENV`:
+
+- En local, usa `ENV=local` y una base de datos Postgres local (servicio `db` de docker-compose).
+- En producción, usa `ENV=production` y variables de entorno reales (nunca subas `.env` real al repositorio).
+
+**Ejemplo de `.env` local:**
+```
+ENV=local
+DJANGO_SECRET_KEY=clave-secreta-local
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+DB_NAME=dividis
+DB_USER=postgres
+DB_PASSWORD=postgres
+DB_HOST=db
+DB_PORT=5432
+```
+
+**Ejemplo de `.env` producción (solo en entorno cloud, nunca en el repo):**
+```
+ENV=production
+DJANGO_SECRET_KEY=clave-secreta-produccion
+DEBUG=False
+ALLOWED_HOSTS=dominio-backend.com
+CORS_ALLOWED_ORIGINS=https://southamerica-west1.run.app
+DB_NAME=postgres
+DB_USER=postgres
+DB_PASSWORD=tu-contraseña-supabase
+DB_HOST=db.mhdwksztdotokkmpgccg.supabase.co
+DB_PORT=5432
+```
+
+**Recomendaciones:**
+- Usa Google Secret Manager, Render o el panel de variables de entorno de tu proveedor cloud para definir los secretos.
+- Nunca subas datos reales ni `.env` de producción a GitHub.
+- El backend detecta el entorno automáticamente según la variable `ENV`.
+
+
 ## Consumo de la API desde otros proyectos
 
-- La API de este backend estará disponible en la URL pública configurada en el despliegue (por ejemplo, `https://tu-backend.com/api/`).
+- La API de este backend estará disponible en la URL pública configurada en el despliegue (por ejemplo, `https://dividis-backend-996639584668.southamerica-west1.run.app/api/schema/swagger-ui/`).
 - Para consumir la API desde otros proyectos (frontend, microservicios, etc.), asegúrate de agregar el dominio de origen en la variable `CORS_ALLOWED_ORIGINS` del archivo `.env`.
 - Ejemplo de configuración para permitir peticiones desde varios orígenes:
   ```
@@ -44,27 +85,8 @@ Sigue las instrucciones en consola para definir usuario, email y contraseña.
   ```
 - Si necesitas exponer la API a servidores externos (Google Cloud, Supabase, etc.), incluye sus URLs aquí.
 
-## Despliegue en Render (producción)
 
-Para desplegar este backend en [Render](https://render.com):
 
-1. Sube tu repositorio a GitHub.
-2. En Render, crea un nuevo servicio tipo **Web Service** y selecciona tu repo.
-3. Render detectará el `Dockerfile` automáticamente.
-4. Configura las variables de entorno en el panel de Render (no uses `.env` en producción):
-
-   - `DEBUG=False`
-   - `DJANGO_SECRET_KEY=una-clave-segura`
-   - `ALLOWED_HOSTS=dominio-que-te-da-render.com`
-   - `CORS_ALLOWED_ORIGINS=https://dividisfront-996639584668.southamerica-west1.run.app`
-   - `DB_NAME=dividis`
-   - `DB_USER=usuario_postgres`
-   - `DB_PASSWORD=contraseña_postgres`
-   - `DB_HOST=host_postgres_render`
-   - `DB_PORT=5432`
-
-5. Si usas base de datos de Render, crea el servicio Postgres y copia los datos de conexión.
-6. El frontend debe consumir la API usando la URL pública de Render.
 
 **Importante:**  
 En producción, solo permite el dominio del frontend productivo en `CORS_ALLOWED_ORIGINS` para mayor seguridad.

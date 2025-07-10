@@ -16,8 +16,21 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'django-insecure-default-key-for-development')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Entorno (local o production)
+ENV = os.getenv('ENV', 'local')
+
+# Configuración según entorno
+if ENV == 'production':
+    DEBUG = False
+    ALLOWED_HOSTS = ['*']  # Temporalmente para pruebas
+    CORS_ALLOW_ALL_ORIGINS = True  # Temporalmente para pruebas
+else:
+    DEBUG = True
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000'
+    ]
 
 # Application definition
 INSTALLED_APPS = [
@@ -77,7 +90,9 @@ DATABASES = {
         'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
         'PORT': os.getenv('DB_PORT', '5432'),
-}
+        # SSL para producción (Supabase Pooler)
+        'OPTIONS': {'sslmode': 'require'} if ENV == 'production' else {},
+    }
 }
 
 # Password validation
@@ -123,6 +138,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ],
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
 }
 
 # JWT Settings
@@ -133,11 +153,18 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
 }
 
-ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'https://services-dividis.jmtqu4.easypanel.host/',
+    'https://dividisfront-996639584668.southamerica-west1.run.app',
 ]
+
+# Configuración de CORS
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    'https://dividisfront-996639584668.southamerica-west1.run.app'
+]
 
 # API Documentation
 SPECTACULAR_SETTINGS = {
@@ -158,4 +185,30 @@ INITIAL_MODULE = os.getenv('INITIAL_MODULE', 'salud')
 DEFAULT_MISSION_POINTS = int(os.getenv('DEFAULT_MISSION_POINTS', '100'))
 
 
-LOGGING_CONFIG = None
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
+}

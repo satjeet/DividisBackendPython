@@ -42,12 +42,11 @@ EXPOSE 8008
 
 # Production entrypoint
 CMD ["sh", "-c", \
-    "./wait-for-postgres.sh services_pgsql_engine && \
-     python manage.py migrate --noinput && \
+    "python manage.py migrate --noinput && \
      python manage.py load_level_titles || true && \
      python manage.py loaddata api/fixtures/initial_modules.json || true && \
      python manage.py load_initial_missions || true && \
-     gunicorn --bind 0.0.0.0:8008 \
+     gunicorn --bind 0.0.0.0:${PORT:-8008} \
               --workers 4 \
               --timeout 120 \
               --access-logfile - \
